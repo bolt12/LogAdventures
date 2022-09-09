@@ -10,7 +10,7 @@ This is the context to how I started to explore this theme a little more. You se
 
 ## Finding a way of making $\log_2$ bijective
 
-I started by looking online and it might have been the way I framed the question or the search engine I was using, but I didn't really find anything particularly useful nor illuminating about this topic. After researching it myself, the main obstacle I found was that the remainder (I'll refer to the fractional part of the $log_2$ result as 'remainder') of a $\log_2$ computation also behaves logarithmic-ally so I could not envision how an elegant specification for it can look... my attempts started in the form of $\log_b a = (x, r) \implies a = b^x + r$, so the integer part of the result is applied to the inverse function and an additive remainder, much like what happens in the division case. Addition ($b^x + r$) in the argument to $\log_b$ might seem a little fishy to some, I guess this uneasy feeling is due to the fact that there are no known simple properties which involve $\log$ of sums. In contrast, there are useful properties for multiplying, dividing sums!
+I started by looking online and it might have been the way I framed the question or the search engine I was using, but I didn't really find anything particularly useful nor illuminating about this topic. After researching it myself, the main obstacle I found was that the remainder (I'll refer to the fractional part of the $log_2$ result as 'remainder') of a $\log_2$ computation also behaves logarithmic-ally so I could not envision how an elegant specification for it can look... my attempts started in the form of $\log_b a = (x, r) \implies a = b^x + r$, so the integer part of the result is applied to the inverse function and an additive remainder, much like what happens in the division case. Addition ( $b^x + r$ ) in the argument to $\log_b$ might seem a little fishy to some, I guess this uneasy feeling is due to the fact that there are no known simple properties which involve $\log$ of sums. In contrast, there are useful properties for multiplying, dividing sums!
 
 Much like division is the hard dual/inverse of multiplication, logarithm is the hard dual/inverse of exponentiation, i.e. it is much easier to multiply/exponentiate than it is to divide/log. Having said this, since exponentiation is dual to the logarithm then surely the specification that relates the computation's remainder and integer part will be also related via exponentiation! Maybe we will have a better chance obtaining insights by studying logarithm's simpler dual.
 
@@ -124,7 +124,7 @@ $$
  & x_1 + \log_2 y_1 + x_2 + \log_2 y_2 \\
 =&\langle\ \text{\{ trivial \}}\ \rangle \\
  & x_1 + x_2 + \log_2 y_1 + \log_2 y_2 \\
-=&\langle\ cong (\lambda x \rightarrow x_1 + x_2 + x) (\log_2 [ a * b ]{\equiv}\log_2 a {+} \log_2 b\ \ y₁\ y₂)\ \rangle \\
+=&\langle\ cong\ (\lambda x \rightarrow x_1 + x_2 + x) (\log_2 [ a * b ]{\equiv}\log_2 a {+} \log_2 b\ \ y₁\ y₂)\ \rangle \\
  & x_1 + x_2 + \log_2 (y_1 * y_2) \\
 \end{align*}
 $$
