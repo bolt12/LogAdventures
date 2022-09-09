@@ -32,7 +32,7 @@ $$
 \end{align*}
 $$
 
-So if we have something like `divMod` but for $\log$ where $log\ b\ a = (x , y)$, where $x$ is the integer part and $y$ is the remainder as explained above, then this is the specification that tights everything together:
+So if we have something like `divMod` but for $\log$ where $\log\ b\ a = (x , y)$, where $x$ is the integer part and $y$ is the remainder as explained above, then this is the specification that tights everything together:
 
 $$
 b^x * y = a
@@ -89,7 +89,7 @@ I like to think this more a coincidence than a fact because, at least in my case
 
 Regarding the second point:
 
-Gave this a go and if we take one particular example $log₂ (20 * 20) = log₂ 20 + log₂ 20$:
+Gave this a go and if we take one particular example $\log_2 (20 * 20) = \log_2 20 + \log_2 20$:
 
 $$
 \begin{align*}
@@ -106,7 +106,7 @@ $$
 \end{align*}
 $$
 
-I reached a sound definition of addition on log, but to double check, let's apply these arguments to the $b^x * y = a$ property, where $b = 2$, $x = 8$ and $y = 25 / 16$: $2^8 * 25 / 16 = 20 * 20$. Hurray!
+I reached a sound definition of addition on log, but to double check, let's apply these arguments to the $b^x * y = a$ property (where $b = 2$, $x = 8$ and $y = 25 / 16$): $2^8 * 25 / 16 = 20 * 20$. Hurray!
 
 Now, how to derive this from the generic formula?
 
