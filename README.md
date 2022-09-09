@@ -21,13 +21,13 @@ Solving this last equation for $y$ gives us $2^y = 20 / 2^4 = 20 / 16 ≡ 5 / 4$
 $$
 \begin{align*}
  & 2^{4 + \log_2 (5 / 4)} \\
-=&\quad {\textasciicircum}\text{\{ - \}}{distrib^l}\text{\{ -+-* \}} 2\ 4\ (5 / 4) \\
+=&\langle\ {\textasciicircum}\text{\{ - \}}{distrib^l}\text{\{ -+-* \}} 2\ 4\ (5 / 4)\ \rangle \\
  & 2^4 * 2^{\log_2 (5 / 4)} \\
-=&\quad cong\ (\lambda x \rightarrow 2^4 * x)\ 2^{\log_2 x} {\equiv} x \\
+=&\langle\ cong\ (\lambda x \rightarrow 2^4 * x)\ 2^{\log_2 x} {\equiv} x\ \rangle\\
  & 2^4 * (5 / 4) \\
-=&\quad \text{\{ trivial \}} \\
+=&\langle\ \text{\{ trivial \}}\ \rangle \\
  & 16 * (5 / 4) \\
-=&\quad \text{\{ trivial \}} \\
+=&\langle\ \text{\{ trivial \}}\ \rangle \\
  & 20
 \end{align*}
 $$
@@ -43,9 +43,9 @@ A multiplicative rather than additive remainder in the logarithmic realm, relati
 $$
 \begin{align*}
  & \log_2 (2^x * y) \\
-=&\quad \log_2 [ a * b ]{\equiv}\log_2 a {+} \log_2 b\ \ 2^x\ \ y \\
+=&\langle\ \log_2 [ a * b ]{\equiv}\log_2 a {+} \log_2 b\ \ 2^x\ \ y\ \rangle \\
  & \log_2\ 2^x + \log_2 y \\
-=&\quad \text{\{ trivial \}} \\
+=&\langle\ \text{\{ trivial \}}\ \rangle\\
  & x + \log_2 y \\
 \end{align*}
 $$
@@ -74,7 +74,7 @@ Division is the inverse of multiplication via $a / b = x \iff x * b = a$. If I m
 $$
 \begin{align*}
  & (i + r) * b = a \\
-=&\quad \ast\text{\{ - \}}{distrib^r}\text{\{ -+ \}}\ b\ x\ y \\
+=&\langle\ \ast\text{\{ - \}}{distrib^r}\text{\{ -+ \}}\ b\ x\ y\ \rangle\\
  & i * b + r * b = a \\
 \end{align*}
 $$
@@ -94,14 +94,14 @@ Gave this a go and if we take one particular example $log₂ (20 * 20) = log₂ 
 $$
 \begin{align*}
  & \log_2 (20 * 20) \\
-=&\quad \log_2 [ a * b ]{\equiv}\log_2 a {+} \log_2 b\ \textunderscore\ \textunderscore \\
+=&\langle\ \log_2 [ a * b ]{\equiv}\log_2 a {+} \log_2 b\ \textunderscore\ \textunderscore\ \rangle\\
  & \log_2 20 + \log_2 20 \\
-=&\quad \text{\{ trivial \}} \\
+=&\langle\ \text{\{ trivial \}}\ \rangle \\
  & (4 , 5 / 4) + (4 , 5 / 4) \\
-=&\quad \text{\{ here I had to use the calculator and some trial and error
-                 to figure out what a suitable definition for _+_ could be \}} \\
+=&\langle\ \text{\{ here I had to use the calculator and some trial and error \}} \\
+ &\ \ \text{\{ to figure out what a suitable definition for _+_ could be \}}\ \rangle \\
  & (4 + 4 , 5/4 * 5/4) \\
-=&\quad \text{\{ trivial \}} \\
+=&\langle\ \text{\{ trivial \}}\ \rangle \\
  & (8 , 25 / 16) \\
 \end{align*}
 $$
@@ -114,17 +114,17 @@ $$
 \text{\{ Assume \} \log_2 a = (x_1 , y_1) \text{\{ and \} \log_2 b = (x_2 , y_2)
 \begin{align*}
  & \log_2 (a * b) = \log_2 a + \log_2 b \\
-=&\quad \text{\{ apply \}} b^x * y = a \\
+=&\langle\ \text{\{ apply \}} b^x * y = a\ \rangle\\
  & \log_2 ((2^{x_1} * y_1) * (2^{x_2} * y_2)) \\
-=&\quad \text{\{ note that \}} y = 2^{\log_2 y} \\
+=&\langle\ \text{\{ note that \}} y = 2^{\log_2 y}\ \rangle \\
  & \log_2 (2^{x_1 + \log_2 y_1} * 2^{x_2 + \log_2 y_2}) \\
-=&\quad sym (cong\ \log_2 ({\textasciicircum}\text{\{ - \}}{distrib^l}\text{\{ -+-* \}}\ \ 2\ (x_1 + \log_2 y_1)\ (x_2 + \log_2 y_2)) \\
+=&\langle\ sym\ (cong\ \log_2 ({\textasciicircum}\text{\{ - \}}{distrib^l}\text{\{ -+-* \}}\ 2\ (x_1 + \log_2 y_1)\ (x_2 + \log_2 y_2))\ \rangle\\
  & log₂ (2^{x_1 + \log_2 y_1 + x_2 + \log_2 y_2}) \\
-=&\quad \log_2 [ 2ˣ ]{\equiv}x \\
+=&\langle\ \log_2 [ 2ˣ ]{\equiv}x\ \rangle \\
  & x_1 + \log_2 y_1 + x_2 + \log_2 y_2 \\
-=&\quad \text{\{ trivial \}} \\
+=&\langle\ \text{\{ trivial \}}\ \rangle \\
  & x_1 + x_2 + \log_2 y_1 + \log_2 y_2 \\
-=&\quad cong (\lambda x \rightarrow x_1 + x_2 + x) (\log_2 [ a * b ]{\equiv}\log_2 a {+} \log_2 b\ \ y₁\ y₂) \\
+=&\langle\ cong (\lambda x \rightarrow x_1 + x_2 + x) (\log_2 [ a * b ]{\equiv}\log_2 a {+} \log_2 b\ \ y₁\ y₂)\ \rangle \\
  & x_1 + x_2 + \log_2 (y_1 * y_2) \\
 \end{align*}
 $$
