@@ -74,7 +74,7 @@ Division is the inverse of multiplication via $a / b = x \iff x * b = a$. If I m
 $$
 \begin{align*}
  & (i + r) * b = a \\
-=&\quad \text{\{ trivial \}} \\
+=&\quad \ast\text{\{ - \}}{distrib^r}\text{\{ -+ \}}\ b\ x\ y \\
  & i * b + r * b = a \\
 \end{align*}
 $$
