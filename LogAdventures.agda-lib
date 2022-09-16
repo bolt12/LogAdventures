@@ -1,0 +1,4 @@
+name: LogAdventures
+depend: standard-library
+include: .
+
