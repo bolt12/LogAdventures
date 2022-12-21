@@ -4,29 +4,123 @@
 module README where
 ```
 
-This is a literate Agda file, all code written here type checks. Github's LateX support is also used write equational reasoning proofs in a similar way one would do in Agda and Agda's lemma names one might be familiar were favored, except when there was no suitable lemma yet or when the reasoning is rather trivial.
+This is a literate Agda file, all code written here type
+checks. Github's LateX support is also used write equational reasoning
+proofs in a similar way one would do in Agda and Agda's lemma names
+one might be familiar were favored, except when there was no suitable
+lemma yet or when the reasoning is rather trivial.
 
 ## Context
 
-Recently I found myself needing to write a proof involving logarithms on natural numbers in Agda. I came to realise that at the time Agda didn't have any out of the box support for logarithms (of base 2) so I gave it a go (see [here](https://github.com/agda/agda-stdlib/pull/1782)). I managed to write a truncated versions of $\log$ in Agda and successfully proved what I wanted.
+Recently I found myself needing to write a proof involving logarithms
+on natural numbers in Agda. I came to realise that at the time Agda
+didn't have any out of the box support for logarithms (of base 2) so I
+gave it a go (see
+[here](https://github.com/agda/agda-stdlib/pull/1782)). I managed to
+write a truncated versions of $\log$ in Agda and successfully proved
+what I wanted.
 
-I quickly realised that my truncated $\log$ is only so useful, since it is not written as the composition of two other more fundamental functions it loses information. For instance, the floored logarithm: $\lfloor \log_2 \rfloor = \lfloor \textunderscore \rfloor \circ \log_2$, where $\log_2$ computes the exact value of the logarithm and $\lfloor \textunderscore \rfloor$ floors the result to the nearest smallest integer.
+I quickly realised that my truncated $\log$ is only so useful, and
+does not allow one to prove more interesting things using the known
+logarithmic identity properties. Since it is not written as the
+composition of two other more fundamental functions it loses
+information. For instance, the floored logarithm:
+$\lfloor \log_2 \rfloor = \lfloor \textunderscore \rfloor \circ \log_2$,
+where $\log_2$ computes the exact value of the logarithm and
+$\lfloor \textunderscore \rfloor$ floors the result to the nearest
+smallest integer.
 
-Division on natural numbers is similar in this sense, but we can recover lost information, i.e. make integer division bijective by computing its remainder (hence obtaining the known `divMod` function), and relate it with its quotient via the $dividend = divisor * quotient + remainder$ property.
+Division on natural numbers is similar in this sense, but we can
+recover lost information, i.e. make integer division bijective by
+computing its remainder (hence obtaining the known `divMod` function),
+and relate it with its quotient via the following theorem:
+$dividend = divisor * quotient + remainder$ called Quotient
+Remainder Theorem (QRT).
 
-Unfortunately, information loss interferes with compositionality and if we can recover it for the logarithm function we would be able to prove much stronger lemmas with it. So, with this being said, is it there a way of recovering the lost information when computing the $\log$ function on natural numbers?
+Unfortunately, information loss interferes with compositionality.
+Division on naturals is about lowering resolution and the `mod`
+function captures exaclty the information that division discards. So,
+in the same way that `divMod` is bijective and so fixes the
+information loss of `div`, is there a neat, bijective augmentation of
+$\lfloor \log_2 \rfloor = \lfloor \textunderscore \rfloor \circ \log_2$
+(assuming positive integers as arguments, at least for now), and what
+would be the theorem that relates everything together?
 
 ## Finding a way to recover the lost information
 
-There's not much literature on this particular topic. Most ways to compute logarithm involve dividing the argument by some factor (usually involves the base of the logarithm) multiple times. If integer division is used one gets a truncated result, if floating point division is used we get an approximate result. Interestingly, there's no known algorithm that can compute an exact result using `divMod`, and even if one could exist what would be the relationship between the "remainder" (I overload the word "remainder" to mean a remainder like notion which relates with the integer part according to some specification) and the integer part of such result? Let's think this one through first.
+There's not much literature on this particular topic. Most ways to
+compute logarithm involve dividing the argument by some factor
+(usually involves the base of the logarithm) multiple times. If
+integer division is used one gets a truncated result, if floating
+point division is used we get an approximate result. Interestingly,
+there's no known algorithm that can compute an exact result using
+`divMod`, and even if one could exist what would be the relationship
+between the "remainder" (I overload the word "remainder" to mean a
+remainder like notion, usually a fractional part, which relates with
+the integer part according to some specification) and the integer part
+of such result? Let's think about this one first.
 
-The fractional part of a $\log_2$ computation behaves logarithmically, so it is hard to visualise how an elegant specification for it can look. Attempts started by drawing inspiration from the division's specification, where the quotient is applied to the inverse function (multiplication) and the remainder is an additive one. Following this, $\log$ inverse is the exponentiation function so it looks something of the form: $\log_b a = (x, r) \implies a = b^x + r$. A reader with a good deal of experience with logarithmic functions and their properties will see addition ( $b^x + r$ ) in the argument to $\log_b$ as slightly suspicious, due to the fact that there are no known simple properties which involve $\log$ of sums. This attempt turned out to lead to a dead-end precisely because of this reason. In contrast, there are useful properties for multiplication or division!
+The fractional part of a $\log_2$ computation behaves
+logarithmically. This is can be highlighted by the following
+logarithmic identity:
+$\log_b (x * \frac{1}{x}) = \log_b x + \log_b \frac{1}{x}$. Given
+this, it's difficult to imagine how a specification for it that does
+not mentions logarithms could look. Attempts started by drawing
+inspiration from the division's specification (QRT), where the quotient is
+applied to the inverse function (multiplication) and the remainder is
+an additive one. Following this, $\log$'s inverse is the
+exponentiation function so it looks something of the form:
+$\log_b a = (x, r) \implies a = b^x + r$, assuming here that our
+logarithm function returns both integer and remainder parts. A reader
+with a good deal of experience with logarithmic functions and their
+properties will see addition ( $b^x + r$ ) in the argument to $\log_b$
+as slightly suspicious, due to the fact that there are no known simple
+properties which involve $\log$ of sums. This path will lead to many
+obstacles exactly because of this. Alternatively, one should pursue a
+path where there are useful properties to leverage from and there are
+a lot for multiplication or division!
 
-Division [is often](https://repositorio.inesctec.pt/server/api/core/bitstreams/844cf125-abaf-447c-aecf-fa8fe3ff47e1/content) regarded as much simpler than its dual/inverse: division. In the same spirit, the dual/inverse of the logarithm, i.e. exponentiation, is also deemed simpler since both build on top of the same operations. Having said this, it can be helpful to perform the explorations and research on the easy side and once finished trace back to the dual side. Surely the specification that relates the $\log$ computation remainder and integer results must be also related via exponentiation!
+Multiplication [is
+often](https://repositorio.inesctec.pt/server/api/core/bitstreams/844cf125-abaf-447c-aecf-fa8fe3ff47e1/content)
+regarded as much simpler than its dual/inverse: division. In the same
+spirit, the dual/inverse of the logarithm, i.e. exponentiation, is
+also deemed simpler since both build on top of the same
+operations. Having said this, it is helpful to reason and explore on
+the easy side and once finished go back to the dual side, since the
+specification that relates the $\log$ computation remainder and
+integer results must be also related via exponentiation.
 
-Given that getting the integer part of the result is straightforward, lets then start by figuring out how the remainder of a particular computation can look like, by calculating $\log_2 20$ by hand. $\log_2 20 \approx 4.321$ so $4$ integer part and $0.321$ fractional part. As mentioned earlier, if the property relating these two values were to be such that the remainder was additive, then it would be as simple as making the remainder be the fractional part $0.321$, however, as also mentioned previously, doing so would not be much of interest since one wouldn't be able to relate it to other logarithmic properties. What we try instead is to find how such additive remainder can look like on the dual operation: $x = \log_2 20 \iff 2^x = 20$, if we make $x = (i + r)$ ( $integer + remainder$ ) then $(i + r) = \log_2 20 \iff 2^{i + r} = 20$, and since we know that $i = 4$ then $2^{4 + r} = 20$. Notice how this is equivalent to find a way to decompose $20$ into two powers of two parts on the logarithm side: $20 = 2^i * 2^r \implies \log_2 20 = \log_2 (2^i * 2^r) = \log_2 2^i + \log_2 2^r = i + r$ this reasoning is arguably more contrived.
+Getting the integer part of the result is not difficult, even in
+computational terms it is known how to get the truncated results as I
+mentioned in the first section. However, recovering the lost
+information by the truncation and relate it with the argument and
+result is what we are after.
 
-Solving one of the previous equations for $r$ gives us $2^r = 20 / 2^4 = 20 / 16 ≡ 5 / 4$, so applying the inverse relation again $r = \log_2 (5 / 4)$, the remainder is found! And indeed $\log_2 (5 / 4)$ is around $0.321$ (i.e. the fractional part of $\log_2 20$). So if $i = 4$ and $r = \log_2 (5/4)$, one gets:
+Let's start with a manual example, and try figuring out how we can
+find and relate the remainder of a particular logarithmic
+computation. $\log_2 20 \approx 4.321$ so $4$ is integer part and
+$0.321$ is the fractional part. As mentioned earlier, if the theorem
+that relates these two values were to be such that the remainder was
+additive, then it would be as simple as making the remainder be the
+fractional part $0.321$, however, as also mentioned previously, doing
+so would not be much of interest since one wouldn't be able to relate
+it to other logarithmic properties. What we try instead is to find how
+such additive remainder can look like on the dual (simpler) operation
+side $x = \log_2 20 \iff 2^x = 20$, if we make $x = (i + r)$
+($integer + remainder$ ) then
+$(i + r) = \log_2 20 \iff 2^{i + r} = 20$. We know that, for this
+example, $i = 4$, so $2^{4 + r} = 20$. Notice how this is equivalent
+to finding a way to decompose $20$ into two powers of two parts on the
+(dual-dual) logarithm side:
+$20 = 2^i * 2^r \implies \log_2 20 = \log_2 (2^i * 2^r) = \log_2 2^i + \log_2 2^r = i + r$
+this reasoning is arguably more contrived.
+
+Solving the previous equation for $r$ gives us
+$2^r = 20 / 2^4 = 20 / 16 ≡ 5 / 4$, this means that by applying the
+inverse relation again we get $r = \log_2 (5 / 4)$, and thus the
+remainder is found! And just to double check, $\log_2 (5 / 4)$ is
+around $0.321$ (i.e. the fractional part of $\log_2 20$). So if
+$i = 4$ and $r = \log_2 (5/4)$, one gets:
 
 $$
 \begin{align*}
@@ -42,13 +136,20 @@ $$
 \end{align*}
 $$
 
-Since the remainder is a logarithm exponent, it can be simplified to just the argument to the logarithm. So if we have something like `divMod` but for $\log$ where $\log\ b\ a = (x , y)$, where $x$ is the integer part and $y$ is the simplified remainder, then this is the specification that ties everything together:
+Since the remainder is a logarithm exponent, it can be simplified to be
+just the argument to the logarithm, via the logarithmic identity
+$\log_b b^a \equiv a$. So if we have something like `divMod` but for
+$\log$ where $\log\ b\ a = (x , y)$, where $x$ is the integer part and
+$y$ is the simplified remainder, then this is the specification that
+ties everything together:
 
 $$
-b^x * y = a
+log\ b\ a \equiv (x , y) \implies a \equiv b^x * y
 $$
 
-A multiplicative rather than additive remainder in the logarithmic realm, relating to an additive remainder in the exponent realm! Substituting $a$ with the left hand part we get:
+A multiplicative rather than additive remainder in the logarithmic
+realm, relating to an additive remainder in the exponent realm!
+Substituting $a$ with the left hand part we get:
 
 $$
 \begin{align*}
@@ -60,15 +161,37 @@ $$
 \end{align*}
 $$
 
-As it was mentioned in the beginning, the remainder behaves logarithimically and indeed this is highlighted in our reasoning.
+And, as stated in the beginning, we recover the exact equation that
+one was naively attempting to pursue, except that we now have much
+more profound insights into the relationship of all these variables.
+
+Notice that just like the QRT doesn't tell us much how to actually
+compute division, but only asserts that division result is correct,
+the logarithm theorem uncovered above also only allows one to assert
+that logarithm result is correct.
 
 ## Why is the remainder rational?
 
-If we let $divMod\ a\ b = (a / b, a \% b) = (x, y)$ then we have $x * b + y = a$. If we let $logMod_b a = (\log_b a, \log {\textunderscore} mod_b\ a) = (x, y)$ then we have $b^x * y = a$. The structure seems very similar, the only odd thing is that $y$ has to be rational, not integer.
+Notice the following resemblance between the QRT and the theorem
+uncovered for logarithms:
 
-Yes, the structure is very similar. For the integer result part, one applies the inverse function (multiplication for division and exponentiation for logarithm), for the fractional/remainder part the remainder is added in the `divMod` case, but multiplied in the $\log$ case. The key insight here is to see that in the $\log$ case one is actually adding the remainder as well, but in an exponential position and that translates to multiplication!
-
-Actually, for division the remainder is only an integer if their arguments are integer numbers as well. If we apply exactly the same reasoning as in the previous section: division is the inverse of multiplication via $a / b = x \iff x * b = a$; let $x$ be the sum of an integer part ( $i$ ) with a fractional part ( $r$ ) $i + r$ then, substituting $x$ one gets
+Let $divMod\ a\ b = (a / b, a \% b) = (x, y)$ then we have
+$x * b + y = a$. Let
+$logMod_b a = (\log_b a, \log {\textunderscore} mod_b\ a) = (x, y)$
+then we have $b^x * y = a$. These two seem very similar, the only odd
+thing is that $y$ has to be rational, not integer. For the integer
+result part, one applies the inverse function (multiplication for
+division and exponentiation for logarithm), for the
+fractional/remainder part the remainder is added in the `divMod` case,
+but multiplied in the $\log$ case. The key insight here is to see that
+in the $\log$ case one is actually adding the remainder as well, but
+in an exponential position and that translates to multiplication. And,
+actually for division the remainder is only an integer if their
+arguments are integer numbers as well. If we apply exactly the same
+reasoning as in the previous section: division is the inverse of
+multiplication via $a / b = x \iff x * b = a$; let $x$ be the sum of
+an integer part ( $i$ ) with a fractional part ( $r$ ) $i + r$ then,
+substituting $x$ one gets
 
 $$
 \begin{align*}
@@ -78,11 +201,20 @@ $$
 \end{align*}
 $$
 
-This is very close to the `divMod` property that relates quotient and remainder for integer numbers, the insight comes by the fact (or coincidence) That $r * b$ is always a integer number. So for integer number division the formula can be simplified to $i * b + r$. Proof that $r * b$ is always integer: Given that $a * i + b * r = a \iff b * r = a - a * r$ and since $a$ and $a * i$ are naturals and naturals are closed under subtraction, $r * b$ is an integer.
+This is very close to the `divMod` theorem (QRT) that relates quotient
+and remainder for integer numbers, the insight comes by the fact (or
+coincidence) That $r * b$ is always a integer number. So for integer
+number division the formula can be simplified to $i * b + r$. Proof
+that $r * b$ is always integer: Given that
+$a * i + b * r = a \iff b * r = a - a * r$ and since $a$ and $a * i$
+are naturals and naturals are closed under subtraction, $r * b$ is an
+integer.
 
-## Can I prove that $\log_2 (a * b) = \log_2 a + \log_2 b$ ?
+## Does $\log_2 (a * b) = \log_2 a + \log_2 b$ hold?
 
-Assume $\log_2 a = (x_1 , y_1)$ and $\log_2 b = (x_2 , y_2)$:
+Assume $\log_2 a = (x_1 , y_1)$ and $\log_2 b = (x_2 , y_2)$ and that
+$x_1, y_1$ and $x_2, y_2$ are related by the theorem uncovered on the
+previous sections:
 
 $$
 \begin{align*}
@@ -112,7 +244,11 @@ $$
 \end{align*}
 $$
 
-We can indeed prove such a property which means we are in the right track! A particular insight from this proof is that adding two $\log$ tuples together means that the integer components need to be added and the remainder components need to be multiplied, further displaying how well this specification interacts with the logarithmic properties.
+A particular thing to notice from the result of this proof is that
+adding two $\log$ tuples together means that the integer components
+need to be added and the remainder components need to be multiplied,
+highlighting the deep relation this specification has with the
+logarithmic properties.
 
 ## Formalization in Agda
 
@@ -269,4 +405,3 @@ log₂[a*b]≡ₗlog₂a+ₗlog₂b = reflₗ refl
 ## Future Work
 
 How well does this generalize to other types? What about generalizing the reasoning behind finding a suitable way of recovering the lost information of a computation on natural numbers for hyper-operations?
-
