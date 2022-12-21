@@ -107,7 +107,7 @@ so would not be much of interest since one wouldn't be able to relate
 it to other logarithmic properties. What we try instead is to find how
 such additive remainder can look like on the dual (simpler) operation
 side $x = \log_2 20 \iff 2^x = 20$, if we make $x = (i + r)$
-($integer + remainder$ ) then
+( $integer + remainder$ ) then
 $(i + r) = \log_2 20 \iff 2^{i + r} = 20$. We know that, for this
 example, $i = 4$, so $2^{4 + r} = 20$. Notice how this is equivalent
 to finding a way to decompose $20$ into two powers of two parts on the
@@ -175,9 +175,9 @@ that logarithm result is correct.
 Notice the following resemblance between the QRT and the theorem
 uncovered for logarithms:
 
-Let $divMod\ a\ b = (a / b, a \% b) = (x, y)$ then we have
+Let $divMod\ a\ b = (div\ a\ b , mod\ a\ b) = (x , y)$ then we have
 $x * b + y = a$. Let
-$logMod_b a = (\log_b a, \log {\textunderscore} mod_b\ a) = (x, y)$
+$logMod_b\ a = (\log_b a, \log {\textunderscore} mod_b\ a) = (x, y)$
 then we have $b^x * y = a$. These two seem very similar, the only odd
 thing is that $y$ has to be rational, not integer. For the integer
 result part, one applies the inverse function (multiplication for
