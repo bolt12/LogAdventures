@@ -22,29 +22,60 @@ what I wanted.
 
 I quickly realised that my truncated $\log$ is only so useful, and
 does not allow one to prove more interesting things using the known
-logarithmic identity properties. Since it is not written as the
-composition of two other more fundamental functions it loses
-information. For instance, the floored logarithm:
+logarithmic identity properties. Since it loses information. For
+instance if we could express the floored logarithm as:
 $\lfloor \log_2 \rfloor = \lfloor \textunderscore \rfloor \circ \log_2$,
 where $\log_2$ computes the exact value of the logarithm and
 $\lfloor \textunderscore \rfloor$ floors the result to the nearest
-smallest integer.
+smallest integer, would be much better. 
 
 Division on natural numbers is similar in this sense, but we can
 recover lost information, i.e. make integer division bijective by
 computing its remainder (hence obtaining the known `divMod` function),
-and relate it with its quotient via the following theorem:
-$dividend = divisor * quotient + remainder$ called Quotient
-Remainder Theorem (QRT).
+and relate it with its quotient via the so called Quotient Remainder
+Theorem (QRT).
 
 Unfortunately, information loss interferes with compositionality.
 Division on naturals is about lowering resolution and the `mod`
-function captures exaclty the information that division discards. So,
-in the same way that `divMod` is bijective and so fixes the
+function captures exaclty the information that division discards.
+`divMod` is the function that augments `div` with `mod` in order to
+become bijective, making it very simple to get truncated `div` via:
+$\lfloor div\ a \rfloor = \lfloor \textunderscore \rfloor \circ div a $.
+
+So, in the same way that `divMod` is bijective and so fixes the
 information loss of `div`, is there a neat, bijective augmentation of
-$\lfloor \log_2 \rfloor = \lfloor \textunderscore \rfloor \circ \log_2$
-(assuming positive integers as arguments, at least for now), and what
-would be the theorem that relates everything together?
+$\log_b$ (assuming positive integers as arguments, at least for now),
+and what would be the theorem that relates everything together?
+
+## Quotient Remainder Theorem (QRT)
+
+Formally QRT states that:
+
+$\forall\ n, d \in \mathbb{Z},\ d > 0 : n / d \implies \exists\ !q, r \in \mathbb{Z}: n \equiv d * q + r, 0 \leq r < d$
+
+This means that when any integer $n$ is divided by any positive
+integer $d$, there exists a unique result that consists in a quotient
+$q$ and a non-negative remainder $r$, that is smaller than $d$, such
+that the equivalence above holds.
+
+One essential point to note about the QRT is that it does not tell us
+how to calculate actual division but does completely specify its
+operation, allowing us to examine if it is correct.  Finding an
+analogous theorem for logarithms is important since, without it, it
+would be pointless to attempt to devise a bijective augmentation for
+integer logarithms because we wouldn't even know what _that_ means.
+
+As mentioned in the previous section `divMod` is a function that
+augments division by also computing its remainder such that QRT
+holds. In Agda such a function even carries the constructive proof for
+the existence of the quotient and the remainder, however it does not
+carry a proof that these are unique. Let's fix that:
+
+```agda
+  module QRT where
+
+```
+
 
 ## Finding a way to recover the lost information
 
@@ -107,7 +138,7 @@ so would not be much of interest since one wouldn't be able to relate
 it to other logarithmic properties. What we try instead is to find how
 such additive remainder can look like on the dual (simpler) operation
 side $x = \log_2 20 \iff 2^x = 20$, if we make $x = (i + r)$
-( $integer + remainder$ ) then
+($integer + remainder$ ) then
 $(i + r) = \log_2 20 \iff 2^{i + r} = 20$. We know that, for this
 example, $i = 4$, so $2^{4 + r} = 20$. Notice how this is equivalent
 to finding a way to decompose $20$ into two powers of two parts on the
@@ -175,9 +206,9 @@ that logarithm result is correct.
 Notice the following resemblance between the QRT and the theorem
 uncovered for logarithms:
 
-Let $divMod\ a\ b = (div\ a\ b , mod\ a\ b) = (x , y)$ then we have
+Let $divMod\ a\ b = (a / b, a \% b) = (x, y)$ then we have
 $x * b + y = a$. Let
-$logMod_b\ a = (\log_b a, \log {\textunderscore} mod_b\ a) = (x, y)$
+$logMod_b a = (\log_b a, \log {\textunderscore} mod_b\ a) = (x, y)$
 then we have $b^x * y = a$. These two seem very similar, the only odd
 thing is that $y$ has to be rational, not integer. For the integer
 result part, one applies the inverse function (multiplication for
@@ -255,125 +286,125 @@ logarithmic properties.
 First the required imports. Note that we are going to be using Agda's unnormalised rational number representation because they are easier to work with.
 
 ```agda
-open import Data.Nat renaming (_/_ to _/ₙ_)
-open import Data.Nat.Properties using (≤-trans ; m≤m+n)
-open import Data.Integer.Base as ℤ using (ℤ ; +_)
-open import Data.Integer.Properties as ℤ using ()
-open import Data.Rational.Unnormalised renaming (_*_ to _*ℚᵘ_) using (ℚᵘ; _/_; truncate; _≃_; *≡*; ↧_; ↥_)
-open import Data.Rational.Unnormalised.Properties as ℚᵘ using (↥[n/d]≡n; ↧[n/d]≡d)
-open import Relation.Binary.PropositionalEquality
-open import Data.Bool.Base
-open import Data.Unit
-open import Data.Nat.Logarithm
-open import Function.Bijection
+  open import Data.Nat renaming (_/_ to _/ₙ_)
+  open import Data.Nat.Properties using (≤-trans ; m≤m+n)
+  open import Data.Integer.Base as ℤ using (ℤ ; +_)
+  open import Data.Integer.Properties as ℤ using ()
+  open import Data.Rational.Unnormalised renaming (_*_ to _*ℚᵘ_) using (ℚᵘ; _/_; truncate; _≃_; *≡*; ↧_; ↥_)
+  open import Data.Rational.Unnormalised.Properties as ℚᵘ using (↥[n/d]≡n; ↧[n/d]≡d)
+  open import Relation.Binary.PropositionalEquality
+  open import Data.Bool.Base
+  open import Data.Unit
+  open import Data.Nat.Logarithm
+  open import Function.Bijection
 ```
 
 Then some auxiliary lemmas that will be useful mostly for providing non-zeroness proofs.
 
 ```agda
-b^n>0 : ∀ (b n : ℕ) .⦃ _ : NonZero b ⦄ → b ^ n > 0
-b^n>0 _ zero = s≤s z≤n
-b^n>0 (suc b) (suc n) = ≤-trans (b^n>0 (suc b) n) (m≤m+n (suc b ^ n) _)
-
-b^n-NZ : ∀ (b n : ℕ) .⦃ _ : NonZero b ⦄ → NonZero (b ^ n)
-b^n-NZ b n = >-nonZero (b^n>0 b n)
-
-*-NZ : ∀ a b .⦃ _ : NonZero a ⦄ .⦃ _ : NonZero b ⦄ → NonZero (a * b)
-*-NZ (suc a) (suc b) = record { nonZero = tt }
-
-↧[a*b]≡↧a*↧b : ∀ a b → ↧ (a *ℚᵘ b) ≡ ↧ a ℤ.* ↧ b
-↧[a*b]≡↧a*↧b a@record{} b@record{} = refl
-
-↥[a*b]≡↥a*↥b : ∀ a b → ↥ (a *ℚᵘ b) ≡ ↥ a ℤ.* ↥ b
-↥[a*b]≡↥a*↥b a@record{} b@record{} = refl
+  b^n>0 : ∀ (b n : ℕ) .⦃ _ : NonZero b ⦄ → b ^ n > 0
+  b^n>0 _ zero = s≤s z≤n
+  b^n>0 (suc b) (suc n) = ≤-trans (b^n>0 (suc b) n) (m≤m+n (suc b ^ n) _)
+  
+  b^n-NZ : ∀ (b n : ℕ) .⦃ _ : NonZero b ⦄ → NonZero (b ^ n)
+  b^n-NZ b n = >-nonZero (b^n>0 b n)
+  
+  *-NZ : ∀ a b .⦃ _ : NonZero a ⦄ .⦃ _ : NonZero b ⦄ → NonZero (a * b)
+  *-NZ (suc a) (suc b) = record { nonZero = tt }
+  
+  ↧[a*b]≡↧a*↧b : ∀ a b → ↧ (a *ℚᵘ b) ≡ ↧ a ℤ.* ↧ b
+  ↧[a*b]≡↧a*↧b a@record{} b@record{} = refl
+  
+  ↥[a*b]≡↥a*↥b : ∀ a b → ↥ (a *ℚᵘ b) ≡ ↥ a ℤ.* ↥ b
+  ↥[a*b]≡↥a*↥b a@record{} b@record{} = refl
 ```
 
 Finally, here's the `LogMod` representation. Following the same idea as in the Agda standard-library for [`DivMod`](https://agda.github.io/agda-stdlib/Data.Nat.DivMod.html#18810), it has an integer field `w` (`w` for whole), a remainder field and a proof that `w` and `r` are related by the property found on section [Finding a way to recover the lost information](#finding-a-way-to-recover-the-lost-information).
 
 ```agda
-record LogMod (base : ℕ) (a : ℕ) .⦃ _ : NonZero base ⦄ .⦃ _ : NonZero a ⦄ : Set where
-  field
-    w : ℕ
-    r : ℚᵘ
-    property : (+ a / 1) ≃ (+ (base ^ w) / 1) *ℚᵘ r
+  record LogMod (base : ℕ) (a : ℕ) .⦃ _ : NonZero base ⦄ .⦃ _ : NonZero a ⦄ : Set where
+    field
+      w : ℕ
+      r : ℚᵘ
+      property : (+ a / 1) ≃ (+ (base ^ w) / 1) *ℚᵘ r
 ``` 
 
 We are going to need an operation that is able to add two `LogMod`s together, as we seen previously the integer components are added and the remainder components are multiplied. Notice how a proof that adding the integer component and multiplying the remainder component is correct is also required.
 
 ```agda
-_+ₗ_ : ∀ {a b c} .⦃ _ : NonZero a ⦄ .⦃ _ : NonZero b ⦄ .⦃ _ : NonZero c ⦄ .⦃ _ : NonZero (a * c) ⦄
-      → LogMod b a → LogMod b c → LogMod b (a * c)
-_+ₗ_ {a} {b} {c} record { w = w ; r = r ; property = p }
-                record { w = w' ; r = r' ; property = p' } =
-                record { w = w + w'
-                       -- should be (r + r') but or I can't figure out how to write the property
-                       -- proof with opaque variables. Instead, I write the inlined value
-                       ; r = (+ (a * c) / (b ^ (w + w'))) ⦃ b^n-NZ b (w + w')⦄
-                       ; property = *≡* (begin
-                           + (a * c) ℤ.* (↧ (+ (b ^ (w + w')) / 1 *ℚᵘ (+ (a * c) / (b ^ (w + w'))) ⦃ b^n-NZ b (w + w') ⦄))
-                             ≡⟨ cong (+ (a * c) ℤ.*_) (↧[a*b]≡↧a*↧b (+ (b ^ (w + w')) / 1) ((+ (a * c) / (b ^ (w + w'))) ⦃ b^n-NZ b (w + w') ⦄)) ⟩
-                           + (a * c) ℤ.* (↧ (+ (b ^ (w + w')) / 1) ℤ.* (↧ (+ (a * c) / (b ^ (w + w'))) ⦃ b^n-NZ b (w + w') ⦄))
-                             ≡⟨ cong₂ (λ x y → + (a * c) ℤ.* (x ℤ.* y)) (↧[n/d]≡d (+ (b ^ (w + w'))) 1) (↧[n/d]≡d (+ (a * c)) (b ^ (w + w')) ⦃ b^n-NZ b (w + w') ⦄) ⟩
-                           + (a * c) ℤ.* (+ 1 ℤ.* + (b ^ (w + w')))
-                             ≡⟨ cong (+ (a * c) ℤ.*_) (ℤ.*-identityˡ (+ b ^ (w + w'))) ⟩
-                           + (a * c) ℤ.* + (b ^ (w + w'))
-                             ≡⟨ ℤ.*-comm (+ (a * c)) (+ (b ^ (w + w'))) ⟩
-                           + (b ^ (w + w')) ℤ.* + (a * c)
-                             ≡˘⟨ cong₂ ℤ._*_ (↥[n/d]≡n (+ (b ^ (w + w'))) 1) (↥[n/d]≡n (+ (a * c)) (b ^ (w + w')) ⦃ b^n-NZ b (w + w') ⦄) ⟩
-                           ↥ (+ (b ^ (w + w')) / 1) ℤ.* ↥ ((+ (a * c) / (b ^ (w + w'))) ⦃ b^n-NZ b (w + w') ⦄)
-                             ≡˘⟨ ↥[a*b]≡↥a*↥b (+ (b ^ (w + w')) / 1) ((+ (a * c) / (b ^ (w + w'))) ⦃ b^n-NZ b (w + w') ⦄) ⟩
-                           ↥ (+ (b ^ (w + w')) / 1 *ℚᵘ (+ (a * c) / (b ^ (w + w'))) ⦃ b^n-NZ b (w + w') ⦄)
-                             ≡˘⟨ ℤ.*-identityʳ (↥ (+ (b ^ (w + w')) / 1 *ℚᵘ (+ (a * c) / (b ^ (w + w'))) ⦃ b^n-NZ b (w + w') ⦄)) ⟩
-                           ↥ (+ (b ^ (w + w')) / 1 *ℚᵘ (+ (a * c) / (b ^ (w + w'))) ⦃ b^n-NZ b (w + w') ⦄) ℤ.* + 1
-                             ≡⟨ cong (↥ (+ (b ^ (w + w')) / 1 *ℚᵘ (+ (a * c) / (b ^ (w + w'))) ⦃ b^n-NZ b (w + w') ⦄) ℤ.*_) (↧[n/d]≡d (+ (a * c)) 1) ⟩
-                           ↥ (+ (b ^ (w + w')) / 1 *ℚᵘ (+ (a * c) / (b ^ (w + w'))) ⦃ b^n-NZ b (w + w') ⦄) ℤ.* ↧ (+ (a * c) / 1)
-                             ∎)
-                       }
-     where
-       open Data.Rational.Unnormalised.ℚᵘ
-       open ≡-Reasoning
+  _+ₗ_ : ∀ {a b c} .⦃ _ : NonZero a ⦄ .⦃ _ : NonZero b ⦄ .⦃ _ : NonZero c ⦄ .⦃ _ : NonZero (a * c) ⦄
+       → LogMod b a → LogMod b c → LogMod b (a * c)
+  _+ₗ_ {a} {b} {c} record { w = w ; r = r ; property = p }
+                   record { w = w' ; r = r' ; property = p' } =
+                   record { w = w + w'
+                          -- should be (r + r') but or I can't figure out how to write the property
+                          -- proof with opaque variables. Instead, I write the inlined value
+                          ; r = (+ (a * c) / (b ^ (w + w'))) ⦃ b^n-NZ b (w + w')⦄
+                          ; property = *≡* (begin
+                            + (a * c) ℤ.* (↧ (+ (b ^ (w + w')) / 1 *ℚᵘ (+ (a * c) / (b ^ (w + w'))) ⦃ b^n-NZ b (w + w') ⦄))
+                              ≡⟨ cong (+ (a * c) ℤ.*_) (↧[a*b]≡↧a*↧b (+ (b ^ (w + w')) / 1) ((+ (a * c) / (b ^ (w + w'))) ⦃ b^n-NZ b (w + w') ⦄)) ⟩
+                            + (a * c) ℤ.* (↧ (+ (b ^ (w + w')) / 1) ℤ.* (↧ (+ (a * c) / (b ^ (w + w'))) ⦃ b^n-NZ b (w + w') ⦄))
+                              ≡⟨ cong₂ (λ x y → + (a * c) ℤ.* (x ℤ.* y)) (↧[n/d]≡d (+ (b ^ (w + w'))) 1) (↧[n/d]≡d (+ (a * c)) (b ^ (w + w')) ⦃ b^n-NZ b (w + w') ⦄) ⟩
+                            + (a * c) ℤ.* (+ 1 ℤ.* + (b ^ (w + w')))
+                              ≡⟨ cong (+ (a * c) ℤ.*_) (ℤ.*-identityˡ (+ b ^ (w + w'))) ⟩
+                            + (a * c) ℤ.* + (b ^ (w + w'))
+                              ≡⟨ ℤ.*-comm (+ (a * c)) (+ (b ^ (w + w'))) ⟩
+                            + (b ^ (w + w')) ℤ.* + (a * c)
+                              ≡˘⟨ cong₂ ℤ._*_ (↥[n/d]≡n (+ (b ^ (w + w'))) 1) (↥[n/d]≡n (+ (a * c)) (b ^ (w + w')) ⦃ b^n-NZ b (w + w') ⦄) ⟩
+                            ↥ (+ (b ^ (w + w')) / 1) ℤ.* ↥ ((+ (a * c) / (b ^ (w + w'))) ⦃ b^n-NZ b (w + w') ⦄)
+                              ≡˘⟨ ↥[a*b]≡↥a*↥b (+ (b ^ (w + w')) / 1) ((+ (a * c) / (b ^ (w + w'))) ⦃ b^n-NZ b (w + w') ⦄) ⟩
+                            ↥ (+ (b ^ (w + w')) / 1 *ℚᵘ (+ (a * c) / (b ^ (w + w'))) ⦃ b^n-NZ b (w + w') ⦄)
+                              ≡˘⟨ ℤ.*-identityʳ (↥ (+ (b ^ (w + w')) / 1 *ℚᵘ (+ (a * c) / (b ^ (w + w'))) ⦃ b^n-NZ b (w + w') ⦄)) ⟩
+                            ↥ (+ (b ^ (w + w')) / 1 *ℚᵘ (+ (a * c) / (b ^ (w + w'))) ⦃ b^n-NZ b (w + w') ⦄) ℤ.* + 1
+                              ≡⟨ cong (↥ (+ (b ^ (w + w')) / 1 *ℚᵘ (+ (a * c) / (b ^ (w + w'))) ⦃ b^n-NZ b (w + w') ⦄) ℤ.*_) (↧[n/d]≡d (+ (a * c)) 1) ⟩
+                            ↥ (+ (b ^ (w + w')) / 1 *ℚᵘ (+ (a * c) / (b ^ (w + w'))) ⦃ b^n-NZ b (w + w') ⦄) ℤ.* ↧ (+ (a * c) / 1)
+                              ∎)
+                          }
+       where
+         open Data.Rational.Unnormalised.ℚᵘ
+         open ≡-Reasoning
 ```
 
 Equality relation for `LogMod` types.
 
 ```agda
 
-infix 4 _≡ₗ_
-data _≡ₗ_ {a b c} .⦃ _ : NonZero a ⦄ .⦃ _ : NonZero b ⦄ .⦃ _ : NonZero c ⦄ (x : LogMod b a) (y : LogMod b c) : Set where
-  reflₗ : a ≡ c → x ≡ₗ y
+  infix 4 _≡ₗ_
+  data _≡ₗ_ {a b c} .⦃ _ : NonZero a ⦄ .⦃ _ : NonZero b ⦄ .⦃ _ : NonZero c ⦄ (x : LogMod b a) (y : LogMod b c) : Set where
+    reflₗ : a ≡ c → x ≡ₗ y
 
 ```
 
 Defining $\log_2$ function on natural numbers. This function does no lose information.
 
 ```agda
-log₂ : ∀ a .⦃ _ : NonZero a ⦄ → LogMod 2 a
-log₂ a = record
-  { w = i
-  ; r = ((+ a) / (2 ^ i)) ⦃ b^n-NZ 2 i ⦄
-  ; property = *≡* (begin
-      + a ℤ.* (↧ (+ (2 ^ i) / 1 *ℚᵘ (+ a / (2 ^ i)) ⦃ b^n-NZ 2 i ⦄))
-        ≡⟨ cong (+ a ℤ.*_) (↧[a*b]≡↧a*↧b (+ (2 ^ i) / 1) ((+ a / (2 ^ i)) ⦃ b^n-NZ 2 i ⦄)) ⟩
-      + a ℤ.* ((↧ (+ (2 ^ i) / 1)) ℤ.* ↧ ((+ a / (2 ^ i)) ⦃ b^n-NZ 2 i ⦄))
-        ≡⟨ cong₂ (λ x y → + a ℤ.* (x ℤ.* y)) (↧[n/d]≡d (+ (2 ^ i)) 1) (↧[n/d]≡d (+ a) (2 ^ i) ⦃ b^n-NZ 2 i ⦄) ⟩
-      + a ℤ.* (+ 1 ℤ.* + (2 ^ i))
-        ≡⟨ cong (+ a ℤ.*_) (ℤ.*-identityˡ (+ (2 ^ i))) ⟩
-      + a ℤ.* + (2 ^ i)
-        ≡⟨ ℤ.*-comm (+ a) (+ (2 ^ i)) ⟩
-      + (2 ^ i) ℤ.* + a
-        ≡˘⟨ cong (+ (2 ^ i) ℤ.*_) (↥[n/d]≡n (+ a) (2 ^ i) ⦃ b^n-NZ 2 i ⦄) ⟩
-      ↥ (+ (2 ^ i) / 1) ℤ.* ↥ ((+ a / (2 ^ i)) ⦃ b^n-NZ 2 i ⦄)
-        ≡˘⟨ ↥[a*b]≡↥a*↥b (+ (2 ^ i) / 1) ((+ a / (2 ^ i)) ⦃ b^n-NZ 2 i ⦄) ⟩
-      ↥ (+ (2 ^ i) / 1 *ℚᵘ (+ a / (2 ^ i)) ⦃ b^n-NZ 2 i ⦄)
-        ≡˘⟨ ℤ.*-identityʳ (↥ (+ (2 ^ i) / 1 *ℚᵘ (+ a / (2 ^ i)) ⦃ b^n-NZ 2 i ⦄)) ⟩
-      (↥ (+ (2 ^ i) / 1 *ℚᵘ (+ a / (2 ^ i)) ⦃ b^n-NZ 2 i ⦄)) ℤ.* + 1 ∎)
-  }
-  where
-    i = ⌊log₂ a ⌋
-    open ≡-Reasoning
-
-_ : log₂ (20 * 20) ≡ₗ (log₂ 20 +ₗ log₂ 20)
-_ = reflₗ refl
+  log₂ : ∀ a .⦃ _ : NonZero a ⦄ → LogMod 2 a
+  log₂ a = record
+    { w = i
+    ; r = ((+ a) / (2 ^ i)) ⦃ b^n-NZ 2 i ⦄
+    ; property = *≡* (begin
+               + a ℤ.* (↧ (+ (2 ^ i) / 1 *ℚᵘ (+ a / (2 ^ i)) ⦃ b^n-NZ 2 i ⦄))
+               ≡⟨ cong (+ a ℤ.*_) (↧[a*b]≡↧a*↧b (+ (2 ^ i) / 1) ((+ a / (2 ^ i)) ⦃ b^n-NZ 2 i ⦄)) ⟩
+               + a ℤ.* ((↧ (+ (2 ^ i) / 1)) ℤ.* ↧ ((+ a / (2 ^ i)) ⦃ b^n-NZ 2 i ⦄))
+               ≡⟨ cong₂ (λ x y → + a ℤ.* (x ℤ.* y)) (↧[n/d]≡d (+ (2 ^ i)) 1) (↧[n/d]≡d (+ a) (2 ^ i) ⦃ b^n-NZ 2 i ⦄) ⟩
+               + a ℤ.* (+ 1 ℤ.* + (2 ^ i))
+               ≡⟨ cong (+ a ℤ.*_) (ℤ.*-identityˡ (+ (2 ^ i))) ⟩
+               + a ℤ.* + (2 ^ i)
+               ≡⟨ ℤ.*-comm (+ a) (+ (2 ^ i)) ⟩
+               + (2 ^ i) ℤ.* + a
+               ≡˘⟨ cong (+ (2 ^ i) ℤ.*_) (↥[n/d]≡n (+ a) (2 ^ i) ⦃ b^n-NZ 2 i ⦄) ⟩
+               ↥ (+ (2 ^ i) / 1) ℤ.* ↥ ((+ a / (2 ^ i)) ⦃ b^n-NZ 2 i ⦄)
+               ≡˘⟨ ↥[a*b]≡↥a*↥b (+ (2 ^ i) / 1) ((+ a / (2 ^ i)) ⦃ b^n-NZ 2 i ⦄) ⟩
+               ↥ (+ (2 ^ i) / 1 *ℚᵘ (+ a / (2 ^ i)) ⦃ b^n-NZ 2 i ⦄)
+               ≡˘⟨ ℤ.*-identityʳ (↥ (+ (2 ^ i) / 1 *ℚᵘ (+ a / (2 ^ i)) ⦃ b^n-NZ 2 i ⦄)) ⟩
+               (↥ (+ (2 ^ i) / 1 *ℚᵘ (+ a / (2 ^ i)) ⦃ b^n-NZ 2 i ⦄)) ℤ.* + 1 ∎)
+    }
+    where
+      i = ⌊log₂ a ⌋
+      open ≡-Reasoning
+  
+  _ : log₂ (20 * 20) ≡ₗ (log₂ 20 +ₗ log₂ 20)
+  _ = reflₗ refl
 ```
 
 There's a small caveat with our `LogMod` representation, hence with our $\log_2$ function: it is not bijective. `LogMod` allows for more than one representation for the same arguments as mentioned in the comments on the next code snippet. For example, although both are semantically equal, the result of computing `LogMod 2 9` is different than calculating `LogMod 2 3 +ₗ LogMod 2 3`, because, in the latter, when the remainders are multiplied we get a value that is greater than the logarithm's base ($2$). This means that the remainder carries to much information and that this information should be carried over to the integer component of the `LogMod` type.
@@ -381,27 +412,27 @@ There's a small caveat with our `LogMod` representation, hence with our $\log_2$
 Equality for these terms holds due to the fact that their semantics is guaranteed by the `property` field. However this means that if we try to write the floored version of the logarithm function as the composition of two other functions we can not establish a one-to-one correspondance with the original function without any tricks.
 
 ```agda
--- This holds, however:
--- log₂ (3 * 3)    = (3, 9/8)
--- log₂ 3 +ₗ log₂ 3 = (2, 9/4)
-_ : log₂ (3 * 3) ≡ₗ (log₂ 3 +ₗ log₂ 3)
-_ = reflₗ refl
-
-log₂[a*b]≡ₗlog₂a+ₗlog₂b : ∀ {a b} .⦃ _ : NonZero a ⦄ .⦃ _ : NonZero b ⦄ .⦃ _ : NonZero (a * b) ⦄
-                      → log₂ (a * b) ≡ₗ log₂ a +ₗ log₂ b
-log₂[a*b]≡ₗlog₂a+ₗlog₂b = reflₗ refl
-
-⌊log₂′_⌋ : (n : ℕ) .⦃ _ : NonZero n ⦄ → ℕ
-⌊log₂′ n ⌋ = LogMod.w (log₂ n)
--- ^ BUT: ⌊log₂′ n ⌋ ≢ ⌊log₂ n ⌋
-
-
-⌊log₂′′_⌋ : (n : ℕ) .⦃ _ : NonZero n ⦄ → ℕ
-⌊log₂′′ n ⌋ = LogMod.w (log₂ n) + ℤ.∣ truncate (LogMod.r (log₂ n)) ℤ./ (+ 2) ∣
---  ⌊log₂′′ n ⌋ ≡ ⌊log₂ n ⌋ very hard to prove
-
+  -- This holds, however:
+  -- log₂ (3 * 3)    = (3, 9/8)
+  -- log₂ 3 +ₗ log₂ 3 = (2, 9/4)
+  _ : log₂ (3 * 3) ≡ₗ (log₂ 3 +ₗ log₂ 3)
+  _ = reflₗ refl
+  
+  log₂[a*b]≡ₗlog₂a+ₗlog₂b : ∀ {a b} .⦃ _ : NonZero a ⦄ .⦃ _ : NonZero b ⦄ .⦃ _ : NonZero (a * b) ⦄
+                          → log₂ (a * b) ≡ₗ log₂ a +ₗ log₂ b
+  log₂[a*b]≡ₗlog₂a+ₗlog₂b = reflₗ refl
+  
+  ⌊log₂′_⌋ : (n : ℕ) .⦃ _ : NonZero n ⦄ → ℕ
+  ⌊log₂′ n ⌋ = LogMod.w (log₂ n)
+  -- ^ BUT: ⌊log₂′ n ⌋ ≢ ⌊log₂ n ⌋
+  
+  
+  ⌊log₂′′_⌋ : (n : ℕ) .⦃ _ : NonZero n ⦄ → ℕ
+  ⌊log₂′′ n ⌋ = LogMod.w (log₂ n) + ℤ.∣ truncate (LogMod.r (log₂ n)) ℤ./ (+ 2) ∣
+  --  ⌊log₂′′ n ⌋ ≡ ⌊log₂ n ⌋ very hard to prove
 ```
 
 ## Future Work
 
 How well does this generalize to other types? What about generalizing the reasoning behind finding a suitable way of recovering the lost information of a computation on natural numbers for hyper-operations?
+
