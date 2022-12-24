@@ -58,24 +58,17 @@ integer $d$, there exists a unique result that consists in a quotient
 $q$ and a non-negative remainder $r$, that is smaller than $d$, such
 that the equivalence above holds.
 
+As mentioned in the previous section `divMod` is a function that
+augments division by also computing its remainder such that QRT
+holds. In Agda such a function even carries the constructive proof for
+the existence of the quotient and the remainder.
+
 One essential point to note about the QRT is that it does not tell us
 how to calculate actual division but does completely specify its
 operation, allowing us to examine if it is correct.  Finding an
 analogous theorem for logarithms is important since, without it, it
 would be pointless to attempt to devise a bijective augmentation for
 integer logarithms because we wouldn't even know what _that_ means.
-
-As mentioned in the previous section `divMod` is a function that
-augments division by also computing its remainder such that QRT
-holds. In Agda such a function even carries the constructive proof for
-the existence of the quotient and the remainder, however it does not
-carry a proof that these are unique. Let's fix that:
-
-```agda
-  module QRT where
-
-```
-
 
 ## Finding a way to recover the lost information
 
@@ -89,7 +82,7 @@ there's no known algorithm that can compute an exact result using
 between the "remainder" (I overload the word "remainder" to mean a
 remainder like notion, usually a fractional part, which relates with
 the integer part according to some specification) and the integer part
-of such result? Let's think about this one first.
+of such result? Let's think about this first.
 
 The fractional part of a $\log_2$ computation behaves
 logarithmically. This is can be highlighted by the following
@@ -97,19 +90,19 @@ logarithmic identity:
 $\log_b (x * \frac{1}{x}) = \log_b x + \log_b \frac{1}{x}$. Given
 this, it's difficult to imagine how a specification for it that does
 not mentions logarithms could look. Attempts started by drawing
-inspiration from the division's specification (QRT), where the quotient is
-applied to the inverse function (multiplication) and the remainder is
-an additive one. Following this, $\log$'s inverse is the
-exponentiation function so it looks something of the form:
+inspiration from QRT, where the quotient is applied to the inverse
+function (multiplication) and the remainder is an additive
+one. Following this, $\log$'s inverse is the exponentiation function
+so it looks something of the form:
 $\log_b a = (x, r) \implies a = b^x + r$, assuming here that our
 logarithm function returns both integer and remainder parts. A reader
 with a good deal of experience with logarithmic functions and their
 properties will see addition ( $b^x + r$ ) in the argument to $\log_b$
-as slightly suspicious, due to the fact that there are no known simple
-properties which involve $\log$ of sums. This path will lead to many
-obstacles exactly because of this. Alternatively, one should pursue a
-path where there are useful properties to leverage from and there are
-a lot for multiplication or division!
+as slightly suspicious, maybe due to the fact that there are no known
+simple properties which involve $\log$ of sums. This path will lead to
+many obstacles exactly because of this. Alternatively, one should
+pursue a path where there are useful properties to leverage from and
+there are a lot for multiplication or division!
 
 Multiplication [is
 often](https://repositorio.inesctec.pt/server/api/core/bitstreams/844cf125-abaf-447c-aecf-fa8fe3ff47e1/content)
@@ -171,15 +164,14 @@ Since the remainder is a logarithm exponent, it can be simplified to be
 just the argument to the logarithm, via the logarithmic identity
 $\log_b b^a \equiv a$. So if we have something like `divMod` but for
 $\log$ where $\log\ b\ a = (x , y)$, where $x$ is the integer part and
-$y$ is the simplified remainder, then this is the specification that
+$y$ is the simplified rational remainder, then this is the specification that
 ties everything together:
 
-$$
-log\ b\ a \equiv (x , y) \implies a \equiv b^x * y
-$$
+$\forall\ b, n \in \mathbb{Z},\ b > 0, n > 0 : log\_b n \implies \exists\ !x \in \mathbb{Z}, !r \in \mathbb{Q}: n \equiv b^x * r, 0 \leq r < b$
 
 A multiplicative rather than additive remainder in the logarithmic
 realm, relating to an additive remainder in the exponent realm!
+
 Substituting $a$ with the left hand part we get:
 
 $$
@@ -201,12 +193,30 @@ compute division, but only asserts that division result is correct,
 the logarithm theorem uncovered above also only allows one to assert
 that logarithm result is correct.
 
+## Is the theorem sound
+
+Remember the logarithm theorem presented previously:
+
+$\forall\ b, n \in \mathbb{Z},\ b > 0, n > 0 : log\_b n \implies \exists\ !x \in \mathbb{Z},\ !r \in \mathbb{Q}: n \equiv b^x * r, 0 \leq r < b$
+
+Notice that in the same way the QRT requires the remainder to be less
+than the divisor, we also require the remainder in our theorem to be
+smaller than the base of the logarithm. The reason for this is
+because, if we don't then $x$ and $r$ are not unique, which is a
+requirement for the soundness of our theorem when it comes to specify
+what it means to be a logarithm and its relation with the output.
+
+Remember that QRT requires an existence and uniqueness proof and we
+haven't reasoned about this for the presented logarithm theorem. Let's
+do it in this section:
+
+
 ## Why is the remainder rational?
 
 Notice the following resemblance between the QRT and the theorem
 uncovered for logarithms:
 
-Let $divMod\ a\ b = (a / b, a \% b) = (x, y)$ then we have
+Let $divMod\ a\ b = (a / b, a \\% b) = (x, y)$ then we have
 $x * b + y = a$. Let
 $logMod_b a = (\log_b a, \log {\textunderscore} mod_b\ a) = (x, y)$
 then we have $b^x * y = a$. These two seem very similar, the only odd
@@ -375,7 +385,7 @@ Equality relation for `LogMod` types.
 
 ```
 
-Defining $\log_2$ function on natural numbers. This function does no lose information.
+Defining $\log_2$ function on natural numbers. This function does not lose information.
 
 ```agda
   log₂ : ∀ a .⦃ _ : NonZero a ⦄ → LogMod 2 a
@@ -407,9 +417,11 @@ Defining $\log_2$ function on natural numbers. This function does no lose inform
   _ = reflₗ refl
 ```
 
-There's a small caveat with our `LogMod` representation, hence with our $\log_2$ function: it is not bijective. `LogMod` allows for more than one representation for the same arguments as mentioned in the comments on the next code snippet. For example, although both are semantically equal, the result of computing `LogMod 2 9` is different than calculating `LogMod 2 3 +ₗ LogMod 2 3`, because, in the latter, when the remainders are multiplied we get a value that is greater than the logarithm's base ($2$). This means that the remainder carries to much information and that this information should be carried over to the integer component of the `LogMod` type.
-
-Equality for these terms holds due to the fact that their semantics is guaranteed by the `property` field. However this means that if we try to write the floored version of the logarithm function as the composition of two other functions we can not establish a one-to-one correspondance with the original function without any tricks.
+There's a small caveat with our `LogMod` representation, hence with
+our $\log_2$ function: it is not bijective. `LogMod` allows for more
+than one representation for the same arguments. For example, although both are
+semantically equal, the result of computing `LogMod 2 9` is different
+than calculating `LogMod 2 3 +ₗ LogMod 2 3`:
 
 ```agda
   -- This holds, however:
@@ -431,6 +443,20 @@ Equality for these terms holds due to the fact that their semantics is guarantee
   ⌊log₂′′ n ⌋ = LogMod.w (log₂ n) + ℤ.∣ truncate (LogMod.r (log₂ n)) ℤ./ (+ 2) ∣
   --  ⌊log₂′′ n ⌋ ≡ ⌊log₂ n ⌋ very hard to prove
 ```
+
+The reason for this is because in the latter, when the remainders are
+multiplied we get a value that is greater than the logarithm's base
+( $2$ in this case). Remember that QRT requires an uniqueness proof and
+we haven't reason about this for the logarithm theorem, so even though
+semantic equality holds for these terms due to the the `property`
+field, we can not confidently assert that `log₂` is correct without
+this uniqueness guarantee.
+
+However
+this means that if we try to write the floored version of the
+logarithm function as the composition of two other functions we can
+not establish a one-to-one correspondance with the original function
+without any tricks.
 
 ## Future Work
 
